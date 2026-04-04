@@ -1,0 +1,120 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Stores user physical data and nutrition goals.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "height": { "type": "number", "description": "Height in cm" },
+        "weight": { "type": "number", "description": "Weight in kg" },
+        "age": { "type": "number" },
+        "gender": { "type": "string", "enum": ["male", "female", "other"] },
+        "activityLevel": { "type": "string", "enum": ["sedentary", "lightly_active", "moderately_active", "very_active", "extra_active"] },
+        "goal": { "type": "string", "enum": ["fat_loss", "weight_loss", "muscle_gain", "maintenance"] },
+        "dailyCalorieTarget": { "type": "number" },
+        "proteinTarget": { "type": "number" },
+        "carbsTarget": { "type": "number" },
+        "fatsTarget": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "height", "weight", "age", "activityLevel", "goal"]
+    },
+    "DailyLog": {
+      "title": "Daily Log",
+      "description": "Stores user's food intake for a specific day.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "date": { "type": "string", "format": "date", "description": "YYYY-MM-DD" },
+        "items": { 
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "weight": { "type": "number", "description": "Weight in grams" },
+              "calories": { "type": "number" },
+              "protein": { "type": "number" },
+              "carbs": { "type": "number" },
+              "fats": { "type": "number" },
+              "timestamp": { "type": "string", "format": "date-time" }
+            }
+          }
+        },
+        "totalCalories": { "type": "number" },
+        "totalProtein": { "type": "number" },
+        "totalCarbs": { "type": "number" },
+        "totalFats": { "type": "number" }
+      },
+      "required": ["uid", "date"]
+    },
+    "Recipe": {
+      "title": "Recipe",
+      "description": "Healthy recipes with nutritional info.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "type": { "type": "string", "enum": ["veg", "non-veg"] },
+        "category": { "type": "string", "description": "e.g., Breakfast, Lunch, Dinner, Snack" },
+        "ingredients": { "type": "array", "items": { "type": "string" } },
+        "instructions": { "type": "array", "items": { "type": "string" } },
+        "calories": { "type": "number", "description": "Per 100g or per serving" },
+        "protein": { "type": "number" },
+        "carbs": { "type": "number" },
+        "fats": { "type": "number" },
+        "servingSize": { "type": "number", "description": "Weight in grams" },
+        "imageUrl": { "type": "string" },
+        "authorUid": { "type": "string" },
+        "authorName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "likesCount": { "type": "number", "default": 0 }
+      }
+    },
+    "Like": {
+      "title": "Like",
+      "description": "Tracks which user liked which recipe.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "recipeId": { "type": "string" }
+      }
+    },
+    "Cheer": {
+      "title": "Cheer",
+      "description": "Tracks which user cheered for which activity.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "activityId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile data"
+    },
+    "/daily_logs/{logId}": {
+      "schema": "DailyLog",
+      "description": "User's daily food logs"
+    },
+    "/recipes/{recipeId}": {
+      "schema": "Recipe",
+      "description": "Shared healthy recipes"
+    },
+    "/likes/{likeId}": {
+      "schema": "Like",
+      "description": "Recipe likes"
+    },
+    "/cheers/{cheerId}": {
+      "schema": "Cheer",
+      "description": "Community cheers"
+    }
+  }
+}
