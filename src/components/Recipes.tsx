@@ -6,13 +6,63 @@ import { Recipe, UserProfile } from '../types';
 import { ChefHat, Flame, Zap, Droplets, Leaf, Beef, Plus, X, Share2, User, Clock, Heart } from 'lucide-react';
 import { cn } from '../lib/utils';
 
-export const Recipes: React.FC<{ profile: UserProfile }> = ({ profile }) => {
+const getRelevantFoodImage = (name: string, category: string): string => {
+  const normalized = name.toLowerCase();
+  
+  if (normalized.includes('paneer')) {
+    return 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=800&auto=format&fit=crop';
+  }
+  if (normalized.includes('chicken') || normalized.includes('biryani')) {
+    return 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop';
+  }
+  if (normalized.includes('salad')) {
+    return 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop';
+  }
+  if (normalized.includes('dal') || normalized.includes('lentil') || normalized.includes('soup')) {
+    return 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop';
+  }
+  if (normalized.includes('idli') || normalized.includes('dosa') || normalized.includes('samber') || normalized.includes('sambar')) {
+    return 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=800&auto=format&fit=crop';
+  }
+  if (normalized.includes('egg') || normalized.includes('omelette') || normalized.includes('scramble')) {
+    return 'https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=800&auto=format&fit=crop';
+  }
+  if (normalized.includes('yogurt') || normalized.includes('smoothie')) {
+    return 'https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=800&auto=format&fit=crop';
+  }
+  if (normalized.includes('rice') || normalized.includes('pulao')) {
+    return 'https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=800&auto=format&fit=crop';
+  }
+  if (normalized.includes('fish') || normalized.includes('tuna')) {
+    return 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=800&auto=format&fit=crop';
+  }
+  if (normalized.includes('stir fry') || normalized.includes('soya')) {
+    return 'https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=800&auto=format&fit=crop';
+  }
+
+  switch (category?.toLowerCase()) {
+    case 'breakfast':
+      return 'https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=800&auto=format&fit=crop';
+    case 'lunch':
+      return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop';
+    case 'dinner':
+      return 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800&auto=format&fit=crop';
+    case 'snack':
+      return 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?q=80&w=800&auto=format&fit=crop';
+    default:
+      return 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=800&auto=format&fit=crop';
+  }
+};
+
+export const Recipes: React.FC<{ profile: UserProfile; user: any }> = ({ profile, user }) => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'veg' | 'non-veg' | 'salad'>('all');
+  const [filter, setFilter] = useState<'all' | 'favorites' | 'veg' | 'non-veg' | 'salad'>('all');
   const [userLikes, setUserLikes] = useState<Set<string>>(new Set());
+
+  const currentUser = user || auth.currentUser;
 
   // Form State
   const [newRecipe, setNewRecipe] = useState<Partial<Recipe>>({
@@ -30,6 +80,21 @@ export const Recipes: React.FC<{ profile: UserProfile }> = ({ profile }) => {
   });
 
   useEffect(() => {
+    if (!currentUser) return;
+
+    if (currentUser.isDemo) {
+      const localKey = `calorix_recipes_${currentUser.uid}`;
+      const localRecipes = localStorage.getItem(localKey);
+      const parsedRecipes = localRecipes ? JSON.parse(localRecipes) : [];
+      setRecipes([...STATIC_RECIPES, ...parsedRecipes]);
+      setLoading(false);
+      
+      const localLikesKey = `calorix_likes_${currentUser.uid}`;
+      const localLikes = localStorage.getItem(localLikesKey);
+      setUserLikes(new Set(localLikes ? JSON.parse(localLikes) : []));
+      return;
+    }
+
     const q = query(collection(db, 'recipes'), orderBy('createdAt', 'desc'));
     const unsub = onSnapshot(q, (snapshot) => {
       const dbRecipes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Recipe));
@@ -37,61 +102,115 @@ export const Recipes: React.FC<{ profile: UserProfile }> = ({ profile }) => {
       setLoading(false);
     });
 
-    if (auth.currentUser) {
-      const likesQuery = query(collection(db, 'likes'), orderBy('recipeId'));
-      const unsubLikes = onSnapshot(likesQuery, (snapshot) => {
-        const likedIds = new Set(
-          snapshot.docs
-            .filter(doc => doc.data().uid === auth.currentUser?.uid)
-            .map(doc => doc.data().recipeId)
-        );
-        setUserLikes(likedIds);
-      });
-      return () => { unsub(); unsubLikes(); };
-    }
+    const likesQuery = query(collection(db, 'likes'), orderBy('recipeId'));
+    const unsubLikes = onSnapshot(likesQuery, (snapshot) => {
+      const likedIds = new Set(
+        snapshot.docs
+          .filter(doc => doc.data().uid === currentUser?.uid)
+          .map(doc => doc.data().recipeId)
+      );
+      setUserLikes(likedIds);
+    });
 
-    return () => unsub();
-  }, []);
+    return () => { unsub(); unsubLikes(); };
+  }, [currentUser]);
 
   const handleLike = async (recipeId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!auth.currentUser) return;
+    if (!currentUser) return;
 
-    const likeId = `${auth.currentUser.uid}_${recipeId}`;
+    const isStatic = STATIC_RECIPES.some(r => r.id === recipeId);
+
+    if (currentUser.isDemo) {
+      setUserLikes(prev => {
+        const next = new Set(prev);
+        if (next.has(recipeId)) {
+          next.delete(recipeId);
+        } else {
+          next.add(recipeId);
+        }
+        localStorage.setItem(`calorix_likes_${currentUser.uid}`, JSON.stringify(Array.from(next)));
+        return next;
+      });
+
+      // Update in-memory recipe count
+      setRecipes(prev => prev.map(r => {
+        if (r.id === recipeId && !isStatic) {
+          const isCurrentlyLiked = userLikes.has(recipeId);
+          return {
+            ...r,
+            likesCount: Math.max(0, (r.likesCount || 0) + (isCurrentlyLiked ? -1 : 1))
+          };
+        }
+        return r;
+      }));
+      return;
+    }
+
+    const likeId = `${currentUser.uid}_${recipeId}`;
     const likeRef = doc(db, 'likes', likeId);
     const recipeRef = doc(db, 'recipes', recipeId);
     
-    const isStatic = STATIC_RECIPES.some(r => r.id === recipeId);
-    if (isStatic) return;
-
     if (userLikes.has(recipeId)) {
       await deleteDoc(likeRef);
-      const recipeDoc = await getDoc(recipeRef);
-      if (recipeDoc.exists()) {
-        await updateDoc(recipeRef, { likesCount: Math.max(0, (recipeDoc.data().likesCount || 0) - 1) });
+      if (!isStatic) {
+        const recipeDoc = await getDoc(recipeRef);
+        if (recipeDoc.exists()) {
+          await updateDoc(recipeRef, { likesCount: Math.max(0, (recipeDoc.data().likesCount || 0) - 1) });
+        }
       }
     } else {
-      await setDoc(likeRef, { uid: auth.currentUser.uid, recipeId });
-      const recipeDoc = await getDoc(recipeRef);
-      if (recipeDoc.exists()) {
-        await updateDoc(recipeRef, { likesCount: (recipeDoc.data().likesCount || 0) + 1 });
+      await setDoc(likeRef, { uid: currentUser.uid, recipeId });
+      if (!isStatic) {
+        const recipeDoc = await getDoc(recipeRef);
+        if (recipeDoc.exists()) {
+          await updateDoc(recipeRef, { likesCount: (recipeDoc.data().likesCount || 0) + 1 });
+        }
       }
     }
   };
 
   const handleAddRecipe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth.currentUser) return;
+    if (!currentUser) return;
+
+    const recipePayload = {
+      ...newRecipe,
+      authorUid: currentUser.uid,
+      authorName: profile.displayName || 'Anonymous',
+      createdAt: new Date().toISOString(),
+      likesCount: 0,
+      imageUrl: getRelevantFoodImage(newRecipe.name || '', newRecipe.category || 'Lunch'),
+    };
+
+    if (currentUser.isDemo) {
+      const localKey = `calorix_recipes_${currentUser.uid}`;
+      const localRecipes = localStorage.getItem(localKey);
+      const parsedRecipes = localRecipes ? JSON.parse(localRecipes) : [];
+      const newLocalRecipe = { id: `local_${Date.now()}`, ...recipePayload } as Recipe;
+      const updatedRecipes = [newLocalRecipe, ...parsedRecipes];
+      localStorage.setItem(localKey, JSON.stringify(updatedRecipes));
+      
+      setRecipes([...STATIC_RECIPES, ...updatedRecipes]);
+      setShowAddForm(false);
+      setNewRecipe({
+        name: '',
+        description: '',
+        type: 'veg',
+        category: 'Lunch',
+        ingredients: [],
+        instructions: [],
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fats: 0,
+        servingSize: 100,
+      });
+      return;
+    }
 
     try {
-      await addDoc(collection(db, 'recipes'), {
-        ...newRecipe,
-        authorUid: auth.currentUser.uid,
-        authorName: profile.displayName || 'Anonymous',
-        createdAt: new Date().toISOString(),
-        likesCount: 0,
-        imageUrl: `https://picsum.photos/seed/${newRecipe.name?.replace(/\s+/g, '-').toLowerCase()}/800/600`,
-      });
+      await addDoc(collection(db, 'recipes'), recipePayload);
       setShowAddForm(false);
       setNewRecipe({
         name: '',
@@ -112,6 +231,7 @@ export const Recipes: React.FC<{ profile: UserProfile }> = ({ profile }) => {
   };
 
   const filteredRecipes = recipes.filter(r => {
+    if (filter === 'favorites') return userLikes.has(r.id);
     if (filter === 'all') return true;
     if (filter === 'veg') return r.type === 'veg';
     if (filter === 'non-veg') return r.type === 'non-veg';
@@ -137,7 +257,7 @@ export const Recipes: React.FC<{ profile: UserProfile }> = ({ profile }) => {
 
       {/* Filter Tabs */}
       <div className="flex flex-wrap gap-2 mb-8">
-        {['all', 'veg', 'non-veg', 'salad'].map((f) => (
+        {['all', 'favorites', 'veg', 'non-veg', 'salad'].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f as any)}

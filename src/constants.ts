@@ -37,7 +37,7 @@ export const RECIPES: Recipe[] = [
     carbs: 8,
     fats: 10,
     servingSize: 250,
-    imageUrl: 'https://picsum.photos/seed/indian-paneer-salad/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r2',
@@ -52,7 +52,7 @@ export const RECIPES: Recipe[] = [
     carbs: 5,
     fats: 8,
     servingSize: 300,
-    imageUrl: 'https://picsum.photos/seed/grilled-chicken-broccoli/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r3',
@@ -67,7 +67,7 @@ export const RECIPES: Recipe[] = [
     carbs: 20,
     fats: 2,
     servingSize: 150,
-    imageUrl: 'https://picsum.photos/seed/idli-sambar/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r4',
@@ -82,7 +82,7 @@ export const RECIPES: Recipe[] = [
     carbs: 22,
     fats: 3,
     servingSize: 200,
-    imageUrl: 'https://picsum.photos/seed/indian-dal-soup/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1626132647523-66f5bf380027?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r5',
@@ -97,7 +97,7 @@ export const RECIPES: Recipe[] = [
     carbs: 45,
     fats: 8,
     servingSize: 400,
-    imageUrl: 'https://picsum.photos/seed/chicken-biryani-dish/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r6',
@@ -112,7 +112,7 @@ export const RECIPES: Recipe[] = [
     carbs: 18,
     fats: 2,
     servingSize: 150,
-    imageUrl: 'https://picsum.photos/seed/sprouts-salad-healthy/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r7',
@@ -127,7 +127,7 @@ export const RECIPES: Recipe[] = [
     carbs: 6,
     fats: 12,
     servingSize: 300,
-    imageUrl: 'https://picsum.photos/seed/south-indian-fish-curry/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1621510456681-23a23cfb5f57?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r8',
@@ -142,7 +142,7 @@ export const RECIPES: Recipe[] = [
     carbs: 12,
     fats: 22,
     servingSize: 300,
-    imageUrl: 'https://picsum.photos/seed/paneer-power-bowl/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r9',
@@ -157,7 +157,7 @@ export const RECIPES: Recipe[] = [
     carbs: 20,
     fats: 10,
     servingSize: 200,
-    imageUrl: 'https://picsum.photos/seed/soya-stir-fry/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r10',
@@ -172,7 +172,7 @@ export const RECIPES: Recipe[] = [
     carbs: 28,
     fats: 6,
     servingSize: 180,
-    imageUrl: 'https://picsum.photos/seed/moong-dal-chilla/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1624462966581-bc6d768cbce5?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r11',
@@ -187,7 +187,7 @@ export const RECIPES: Recipe[] = [
     carbs: 10,
     fats: 8,
     servingSize: 240,
-    imageUrl: 'https://picsum.photos/seed/greek-yogurt-bowl/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r12',
@@ -202,7 +202,7 @@ export const RECIPES: Recipe[] = [
     carbs: 8,
     fats: 24,
     servingSize: 250,
-    imageUrl: 'https://picsum.photos/seed/paneer-scramble/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r13',
@@ -217,7 +217,7 @@ export const RECIPES: Recipe[] = [
     carbs: 10,
     fats: 18,
     servingSize: 160,
-    imageUrl: 'https://picsum.photos/seed/grilled-chicken-bowl/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r14',
@@ -232,7 +232,7 @@ export const RECIPES: Recipe[] = [
     carbs: 5,
     fats: 6,
     servingSize: 200,
-    imageUrl: 'https://picsum.photos/seed/egg-white-omelette/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r15',
@@ -247,7 +247,7 @@ export const RECIPES: Recipe[] = [
     carbs: 12,
     fats: 15,
     servingSize: 260,
-    imageUrl: 'https://picsum.photos/seed/chicken-stir-fry/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1603133872878-685f548e7a1a?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r16',
@@ -262,7 +262,7 @@ export const RECIPES: Recipe[] = [
     carbs: 6,
     fats: 20,
     servingSize: 250,
-    imageUrl: 'https://picsum.photos/seed/boiled-egg-salad/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1522747776116-64ee0d049c6f?q=80&w=800&auto=format&fit=crop'
   },
   {
     id: 'r17',
@@ -277,6 +277,6 @@ export const RECIPES: Recipe[] = [
     carbs: 5,
     fats: 15,
     servingSize: 160,
-    imageUrl: 'https://picsum.photos/seed/tuna-protein-salad/800/600'
+    imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop'
   }
 ];

@@ -4,7 +4,7 @@ import { signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, si
 import { LogIn, UserPlus, Chrome } from 'lucide-react';
 import { cn } from '../lib/utils';
 
-export const Auth: React.FC = () => {
+export const Auth: React.FC<{ onSkipLogin: () => void }> = ({ onSkipLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -83,10 +83,18 @@ export const Auth: React.FC = () => {
 
         <button
           onClick={handleGoogleSignIn}
-          className="w-full py-3 border border-black/10 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-black/5 transition-all"
+          className="w-full py-3 border border-black/10 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-black/5 transition-all mb-3"
         >
           <Chrome size={18} />
           Google
+        </button>
+
+        <button
+          onClick={onSkipLogin}
+          type="button"
+          className="w-full py-3 border border-dashed border-orange-500/40 text-orange-600 bg-orange-50/50 hover:bg-orange-50 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
+        >
+          🎁 Skip Login & Try Demo Mode
         </button>
 
         <p className="text-center mt-6 text-sm text-black/60">

@@ -6,6 +6,7 @@ import { Users, Target, TrendingUp, Award, Heart, MessageCircle, Share2, Flame, 
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatDistanceToNow } from 'date-fns';
+import { RECIPES as STATIC_RECIPES } from '../constants';
 
 enum OperationType {
   CREATE = 'create',
@@ -39,17 +40,32 @@ interface Activity {
   cheers?: number;
 }
 
-export const Community: React.FC = () => {
+export const Community: React.FC<{ user?: any }> = ({ user }) => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [userCheers, setUserCheers] = useState<Set<string>>(new Set());
   
+  const currentUser = user || auth.currentUser;
   const CREATOR_EMAIL = 'aabhi20604@gmail.com';
-  const isCreator = auth.currentUser?.email === CREATOR_EMAIL;
+  const isCreator = currentUser?.email === CREATOR_EMAIL;
 
   useEffect(() => {
+    if (!currentUser) return;
+
+    if (currentUser.isDemo) {
+      const mockUsers: UserProfile[] = [
+        { uid: 'u1', displayName: 'Sarah Jenkins', email: 'sarah@calorix.com', goal: 'weight_loss', height: 165, weight: 62, age: 28, gender: 'female', activityLevel: 'very_active', dailyCalorieTarget: 1800, proteinTarget: 110, carbsTarget: 190, fatsTarget: 55, createdAt: new Date(Date.now() - 86400000 * 2).toISOString() },
+        { uid: 'u2', displayName: 'Marcus Chen', email: 'marcus@calorix.com', goal: 'muscle_gain', height: 182, weight: 78, age: 31, gender: 'male', activityLevel: 'extra_active', dailyCalorieTarget: 3100, proteinTarget: 180, carbsTarget: 340, fatsTarget: 90, createdAt: new Date(Date.now() - 86400000 * 5).toISOString() },
+        { uid: 'u3', displayName: 'Elena Rostova', email: 'elena@calorix.com', goal: 'fat_loss', height: 170, weight: 65, age: 24, gender: 'female', activityLevel: 'moderately_active', dailyCalorieTarget: 2000, proteinTarget: 120, carbsTarget: 210, fatsTarget: 60, createdAt: new Date(Date.now() - 86400000 * 10).toISOString() },
+      ];
+      setUsers(mockUsers);
+      setRecipes(STATIC_RECIPES);
+      setLoading(false);
+      return;
+    }
+
     // Fetch Users
     const usersQuery = query(collection(db, 'users'), limit(50));
     const unsubUsers = onSnapshot(usersQuery, (snapshot) => {
@@ -70,23 +86,19 @@ export const Community: React.FC = () => {
     });
 
     // Fetch Cheers (likes for activities)
-    if (auth.currentUser) {
-      const cheersQuery = query(collection(db, 'cheers'));
-      const unsubCheers = onSnapshot(cheersQuery, (snapshot) => {
-        const cheeredIds = new Set(
-          snapshot.docs
-            .filter(doc => doc.data().uid === auth.currentUser?.uid)
-            .map(doc => doc.data().activityId)
-        );
-        setUserCheers(cheeredIds);
-      }, (error) => {
-        handleFirestoreError(error, OperationType.LIST, 'cheers');
-      });
-      return () => { unsubUsers(); unsubRecipes(); unsubCheers(); };
-    }
-
-    return () => { unsubUsers(); unsubRecipes(); };
-  }, []);
+    const cheersQuery = query(collection(db, 'cheers'));
+    const unsubCheers = onSnapshot(cheersQuery, (snapshot) => {
+      const cheeredIds = new Set(
+        snapshot.docs
+          .filter(doc => doc.data().uid === currentUser?.uid)
+          .map(doc => doc.data().activityId)
+      );
+      setUserCheers(cheeredIds);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'cheers');
+    });
+    return () => { unsubUsers(); unsubRecipes(); unsubCheers(); };
+  }, [currentUser]);
 
   // Derive activities from users and recipes
   useEffect(() => {
@@ -121,14 +133,28 @@ export const Community: React.FC = () => {
   }, [users, recipes]);
 
   const handleCheer = async (activityId: string) => {
-    if (!auth.currentUser) return;
-    const cheerId = `${auth.currentUser.uid}_${activityId}`;
+    if (!currentUser) return;
+
+    if (currentUser.isDemo) {
+      setUserCheers(prev => {
+        const next = new Set(prev);
+        if (next.has(activityId)) {
+          next.delete(activityId);
+        } else {
+          next.add(activityId);
+        }
+        return next;
+      });
+      return;
+    }
+
+    const cheerId = `${currentUser.uid}_${activityId}`;
     const cheerRef = doc(db, 'cheers', cheerId);
 
     if (userCheers.has(activityId)) {
       await deleteDoc(cheerRef);
     } else {
-      await setDoc(cheerRef, { uid: auth.currentUser.uid, activityId, timestamp: new Date().toISOString() });
+      await setDoc(cheerRef, { uid: currentUser.uid, activityId, timestamp: new Date().toISOString() });
     }
   };
 

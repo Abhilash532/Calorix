@@ -31,7 +31,7 @@ const handleFirestoreError = (error: any, operationType: OperationType, path: st
   throw new Error(JSON.stringify(errInfo));
 };
 
-export const Dashboard: React.FC<{ profile: UserProfile }> = ({ profile }) => {
+export const Dashboard: React.FC<{ profile: UserProfile; user: any }> = ({ profile, user }) => {
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [dailyLog, setDailyLog] = useState<DailyLog | null>(null);
   const [showSearch, setShowSearch] = useState(false);
@@ -39,23 +39,44 @@ export const Dashboard: React.FC<{ profile: UserProfile }> = ({ profile }) => {
   const [weightInput, setWeightInput] = useState<number>(100);
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
 
-  useEffect(() => {
-    if (!auth.currentUser) return;
+  const currentUser = user || auth.currentUser;
 
-    const logId = `${auth.currentUser.uid}_${selectedDate}`;
+  useEffect(() => {
+    if (!currentUser) return;
+
+    if (currentUser.isDemo) {
+      const localKey = `calorix_log_${currentUser.uid}_${selectedDate}`;
+      const localData = localStorage.getItem(localKey);
+      if (localData) {
+        setDailyLog(JSON.parse(localData));
+      } else {
+        setDailyLog({
+          uid: currentUser.uid,
+          date: selectedDate,
+          items: [],
+          totalCalories: 0,
+          totalProtein: 0,
+          totalCarbs: 0,
+          totalFats: 0,
+        });
+      }
+      return;
+    }
+
+    const logId = `${currentUser.uid}_${selectedDate}`;
     const unsub = onSnapshot(doc(db, 'daily_logs', logId), (docSnap) => {
       console.log('Daily log snapshot received:', docSnap.exists() ? 'exists' : 'new');
       if (docSnap.exists()) {
         const data = docSnap.data() as DailyLog;
         setDailyLog({
           ...data,
-          uid: data.uid || auth.currentUser!.uid,
+          uid: data.uid || currentUser!.uid,
           date: data.date || selectedDate,
           items: data.items || []
         });
       } else {
         setDailyLog({
-          uid: auth.currentUser!.uid,
+          uid: currentUser!.uid,
           date: selectedDate,
           items: [],
           totalCalories: 0,
@@ -69,12 +90,12 @@ export const Dashboard: React.FC<{ profile: UserProfile }> = ({ profile }) => {
     });
 
     return () => unsub();
-  }, [selectedDate]);
+  }, [selectedDate, currentUser]);
 
   const addFoodToLog = async () => {
-    console.log('addFoodToLog triggered', { selectedFood, weightInput, dailyLog, user: auth.currentUser?.uid });
-    if (!selectedFood || !auth.currentUser) {
-      console.error('Missing selectedFood or auth.currentUser');
+    console.log('addFoodToLog triggered', { selectedFood, weightInput, dailyLog, user: currentUser?.uid });
+    if (!selectedFood || !currentUser) {
+      console.error('Missing selectedFood or currentUser');
       return;
     }
     
@@ -105,9 +126,9 @@ export const Dashboard: React.FC<{ profile: UserProfile }> = ({ profile }) => {
       { calories: 0, protein: 0, carbs: 0, fats: 0 }
     );
 
-    const logId = `${auth.currentUser.uid}_${selectedDate}`;
+    const logId = `${currentUser.uid}_${selectedDate}`;
     const payload = {
-      uid: auth.currentUser.uid,
+      uid: currentUser.uid,
       date: selectedDate,
       items: updatedItems,
       totalCalories: Math.round(totals.calories),
@@ -118,10 +139,16 @@ export const Dashboard: React.FC<{ profile: UserProfile }> = ({ profile }) => {
     
     console.log('Saving log to path:', `daily_logs/${logId}`, 'with payload:', payload);
 
-    try {
-      await setDoc(doc(db, 'daily_logs', logId), payload);
-    } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, `daily_logs/${logId}`);
+    if (currentUser.isDemo) {
+      const localKey = `calorix_log_${currentUser.uid}_${selectedDate}`;
+      localStorage.setItem(localKey, JSON.stringify(payload));
+      setDailyLog(payload);
+    } else {
+      try {
+        await setDoc(doc(db, 'daily_logs', logId), payload);
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, `daily_logs/${logId}`);
+      }
     }
 
     setShowSearch(false);
@@ -130,8 +157,8 @@ export const Dashboard: React.FC<{ profile: UserProfile }> = ({ profile }) => {
   };
 
   const removeItem = async (index: number) => {
-    console.log('removeItem triggered', { index, dailyLog, user: auth.currentUser?.uid });
-    if (!dailyLog || !auth.currentUser) return;
+    console.log('removeItem triggered', { index, dailyLog, user: currentUser?.uid });
+    if (!dailyLog || !currentUser) return;
 
     const updatedItems = dailyLog.items.filter((_, i) => i !== index);
     const totals = updatedItems.reduce(
@@ -144,9 +171,9 @@ export const Dashboard: React.FC<{ profile: UserProfile }> = ({ profile }) => {
       { calories: 0, protein: 0, carbs: 0, fats: 0 }
     );
 
-    const logId = `${auth.currentUser.uid}_${selectedDate}`;
+    const logId = `${currentUser.uid}_${selectedDate}`;
     const payload = {
-      uid: auth.currentUser.uid,
+      uid: currentUser.uid,
       date: selectedDate,
       items: updatedItems,
       totalCalories: Math.round(totals.calories),
@@ -157,10 +184,16 @@ export const Dashboard: React.FC<{ profile: UserProfile }> = ({ profile }) => {
 
     console.log('Removing item, new payload at path:', `daily_logs/${logId}`, 'payload:', payload);
 
-    try {
-      await setDoc(doc(db, 'daily_logs', logId), payload);
-    } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, `daily_logs/${logId}`);
+    if (currentUser.isDemo) {
+      const localKey = `calorix_log_${currentUser.uid}_${selectedDate}`;
+      localStorage.setItem(localKey, JSON.stringify(payload));
+      setDailyLog(payload);
+    } else {
+      try {
+        await setDoc(doc(db, 'daily_logs', logId), payload);
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, `daily_logs/${logId}`);
+      }
     }
   };
 

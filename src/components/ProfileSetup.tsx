@@ -5,7 +5,7 @@ import { UserProfile } from '../types';
 import { calculateTargets } from '../lib/nutritionUtils';
 import { Save } from 'lucide-react';
 
-export const ProfileSetup: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
+export const ProfileSetup: React.FC<{ user: any; onComplete: (profile: UserProfile) => void }> = ({ user, onComplete }) => {
   const [formData, setFormData] = useState({
     height: 170,
     weight: 70,
@@ -18,7 +18,7 @@ export const ProfileSetup: React.FC<{ onComplete: () => void }> = ({ onComplete 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth.currentUser) return;
+    if (!user) return;
     setLoading(true);
 
     const targets = calculateTargets(
@@ -31,17 +31,21 @@ export const ProfileSetup: React.FC<{ onComplete: () => void }> = ({ onComplete 
     );
 
     const profile: UserProfile = {
-      uid: auth.currentUser.uid,
-      displayName: auth.currentUser.displayName || '',
-      email: auth.currentUser.email || '',
+      uid: user.uid,
+      displayName: user.displayName || 'Demo Hero',
+      email: user.email || 'demo@calorix.com',
       ...formData,
       ...targets,
       createdAt: new Date().toISOString(),
     };
 
     try {
-      await setDoc(doc(db, 'users', auth.currentUser.uid), profile);
-      onComplete();
+      if (user.isDemo) {
+        localStorage.setItem(`calorix_profile_demo`, JSON.stringify(profile));
+      } else {
+        await setDoc(doc(db, 'users', user.uid), profile);
+      }
+      onComplete(profile);
     } catch (err) {
       console.error(err);
     } finally {
