@@ -12,7 +12,9 @@ export interface UserProfile {
   proteinTarget: number;
   carbsTarget: number;
   fatsTarget: number;
+  fiberTarget?: number;
   createdAt: string;
+  lastMeasurementsUpdated?: string;
 }
 
 export interface FoodItem {
@@ -22,6 +24,7 @@ export interface FoodItem {
   protein: number;
   carbs: number;
   fats: number;
+  fiber?: number; // per 100g
   servingSize?: number; // default serving size in grams
 }
 
@@ -39,6 +42,7 @@ export interface DailyLog {
   totalProtein: number;
   totalCarbs: number;
   totalFats: number;
+  totalFiber?: number;
 }
 
 export interface Recipe {
@@ -53,6 +57,7 @@ export interface Recipe {
   protein: number;
   carbs: number;
   fats: number;
+  fiber?: number;
   servingSize: number;
   imageUrl?: string;
   authorUid?: string;

@@ -106,7 +106,7 @@ export default function App() {
   }
 
   if (!profile || isEditingProfile) {
-    return <ProfileSetup user={user} onComplete={(newProfile) => { setProfile(newProfile); setIsEditingProfile(false); }} />;
+    return <ProfileSetup user={user} initialProfile={profile} onComplete={(newProfile) => { setProfile(newProfile); setIsEditingProfile(false); }} />;
   }
 
   return (
@@ -173,7 +173,7 @@ export default function App() {
 
       {/* Main Content */}
       <main className="pt-2 md:pt-4">
-        {activeTab === 'dashboard' && <Dashboard profile={profile} user={user} />}
+        {activeTab === 'dashboard' && <Dashboard profile={profile} user={user} onProfileUpdate={setProfile} />}
         {activeTab === 'recipes' && <Recipes profile={profile} user={user} />}
         {activeTab === 'community' && <Community user={user} />}
         {activeTab === 'admin' && isCreator && <Admin />}

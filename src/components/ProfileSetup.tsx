@@ -5,14 +5,14 @@ import { UserProfile } from '../types';
 import { calculateTargets } from '../lib/nutritionUtils';
 import { Save } from 'lucide-react';
 
-export const ProfileSetup: React.FC<{ user: any; onComplete: (profile: UserProfile) => void }> = ({ user, onComplete }) => {
+export const ProfileSetup: React.FC<{ user: any; initialProfile?: UserProfile | null; onComplete: (profile: UserProfile) => void }> = ({ user, initialProfile, onComplete }) => {
   const [formData, setFormData] = useState({
-    height: 170,
-    weight: 70,
-    age: 25,
-    gender: 'male' as const,
-    activityLevel: 'moderately_active' as const,
-    goal: 'maintenance' as const,
+    height: initialProfile?.height ?? 170,
+    weight: initialProfile?.weight ?? 70,
+    age: initialProfile?.age ?? 25,
+    gender: (initialProfile?.gender ?? 'male') as 'male' | 'female' | 'other',
+    activityLevel: (initialProfile?.activityLevel ?? 'moderately_active') as 'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extra_active',
+    goal: (initialProfile?.goal ?? 'maintenance') as 'fat_loss' | 'weight_loss' | 'muscle_gain' | 'maintenance',
   });
   const [loading, setLoading] = useState(false);
 
@@ -36,7 +36,8 @@ export const ProfileSetup: React.FC<{ user: any; onComplete: (profile: UserProfi
       email: user.email || 'demo@calorix.com',
       ...formData,
       ...targets,
-      createdAt: new Date().toISOString(),
+      createdAt: initialProfile?.createdAt || new Date().toISOString(),
+      lastMeasurementsUpdated: initialProfile?.lastMeasurementsUpdated || undefined,
     };
 
     try {

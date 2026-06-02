@@ -38,21 +38,36 @@ export const calculateTargets = (
   const proteinTarget = (calorieTarget * 0.3) / 4;
   const carbsTarget = (calorieTarget * 0.4) / 4;
   const fatsTarget = (calorieTarget * 0.3) / 9;
+  
+  // Fiber: Standard recommendation is 14g of fiber per 1000 calories logged
+  const fiberTarget = (calorieTarget / 1000) * 14;
 
   return {
     dailyCalorieTarget: Math.round(calorieTarget),
     proteinTarget: Math.round(proteinTarget),
     carbsTarget: Math.round(carbsTarget),
     fatsTarget: Math.round(fatsTarget),
+    fiberTarget: Math.round(fiberTarget),
   };
 };
 
-export const calculateNutrients = (item: { calories: number, protein: number, carbs: number, fats: number }, weightGrams: number) => {
+export const calculateNutrients = (
+  item: { calories: number; protein: number; carbs: number; fats: number; fiber?: number },
+  weightGrams: number
+) => {
   const factor = weightGrams / 100;
+  
+  // If fiber is not set, we can intelligently estimate it as ~8% of the carbohydrates for vegetable-based/fruit/grain items,
+  // or default to 0 for highly clean protein items.
+  const baseFiber = typeof item.fiber === 'number' 
+    ? item.fiber 
+    : (item.carbs > 5 && item.protein < 15 ? item.carbs * 0.08 : 0);
+
   return {
     calories: Math.round(item.calories * factor),
     protein: Math.round(item.protein * factor * 10) / 10,
     carbs: Math.round(item.carbs * factor * 10) / 10,
     fats: Math.round(item.fats * factor * 10) / 10,
+    fiber: Math.round(baseFiber * factor * 10) / 10,
   };
 };

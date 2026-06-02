@@ -36,6 +36,7 @@ export const Admin: React.FC = () => {
       'Protein Target',
       'Carbs Target',
       'Fats Target',
+      'Fiber Target',
       'Joined At'
     ];
 
@@ -52,6 +53,7 @@ export const Admin: React.FC = () => {
       u.proteinTarget,
       u.carbsTarget,
       u.fatsTarget,
+      u.fiberTarget || Math.round((u.dailyCalorieTarget / 1000) * 14),
       u.createdAt
     ]);
 
