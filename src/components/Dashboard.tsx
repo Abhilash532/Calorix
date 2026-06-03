@@ -561,12 +561,12 @@ export const Dashboard: React.FC<{ profile: UserProfile; user: any; onProfileUpd
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
         <div className="col-span-1 sm:col-span-2 lg:col-span-2 bg-black text-white p-6 rounded-[32px] relative overflow-hidden shadow-sm">
           <div className="relative z-10">
-            <p className="text-[11px] uppercase tracking-widest opacity-60 mb-1">Calories Remaining</p>
-            <h3 className="text-4xl font-serif italic">{Math.max(0, profile.dailyCalorieTarget - (dailyLog?.totalCalories || 0))}</h3>
+            <p className="text-[11px] uppercase tracking-widest opacity-60 mb-1 font-bold">Calories Remaining</p>
+            <h3 className="text-4xl md:text-5xl font-black font-sans tracking-tight text-white mb-2">{Math.max(0, profile.dailyCalorieTarget - (dailyLog?.totalCalories || 0))}</h3>
             <div className="mt-4 h-2 bg-white/20 rounded-full overflow-hidden">
               <div className="h-full bg-white transition-all duration-500" style={{ width: `${Math.min(100, progress)}%` }}></div>
             </div>
-            <p className="mt-2 text-xs opacity-60">Goal: {profile.dailyCalorieTarget} kcal</p>
+            <p className="mt-2 text-xs opacity-75 font-medium">Goal: <span className="font-black text-white">{profile.dailyCalorieTarget}</span> kcal</p>
           </div>
           <Flame className="absolute -right-4 -bottom-4 opacity-10" size={120} />
         </div>
@@ -575,41 +575,41 @@ export const Dashboard: React.FC<{ profile: UserProfile; user: any; onProfileUpd
         <div className="bg-white p-6 rounded-[32px] border border-black/5 flex flex-col justify-between shadow-sm">
           <div>
             <Zap className="text-orange-500 mb-2" size={20} />
-            <p className="text-[10px] uppercase tracking-widest text-black/40">Protein</p>
-            <p className="text-xl font-serif italic">{dailyLog?.totalProtein || 0}g</p>
+            <p className="text-[10px] uppercase tracking-widest text-black/40 font-bold">Protein</p>
+            <p className="text-2xl font-black font-sans tracking-tight text-stone-900 mt-1">{dailyLog?.totalProtein || 0}g</p>
           </div>
-          <p className="text-[10px] text-black/40">Target: {profile.proteinTarget}g</p>
+          <p className="text-[10px] text-black/50 font-medium">Target: <strong className="font-extrabold text-stone-700">{profile.proteinTarget}g</strong></p>
         </div>
 
         {/* Carbs */}
         <div className="bg-white p-6 rounded-[32px] border border-black/5 flex flex-col justify-between shadow-sm">
           <div>
             <Droplets className="text-blue-500 mb-2" size={20} />
-            <p className="text-[10px] uppercase tracking-widest text-black/40">Carbs</p>
-            <p className="text-xl font-serif italic">{dailyLog?.totalCarbs || 0}g</p>
+            <p className="text-[10px] uppercase tracking-widest text-black/40 font-bold">Carbs</p>
+            <p className="text-2xl font-black font-sans tracking-tight text-stone-900 mt-1">{dailyLog?.totalCarbs || 0}g</p>
           </div>
-          <p className="text-[10px] text-black/40">Target: {profile.carbsTarget}g</p>
+          <p className="text-[10px] text-black/50 font-medium">Target: <strong className="font-extrabold text-stone-700">{profile.carbsTarget}g</strong></p>
         </div>
 
         {/* Fats */}
         <div className="bg-white p-6 rounded-[32px] border border-black/5 flex flex-col justify-between shadow-sm">
           <div>
             <Beef className="text-rose-500 mb-2" size={20} />
-            <p className="text-[10px] uppercase tracking-widest text-black/40">Fats</p>
-            <p className="text-xl font-serif italic">{dailyLog?.totalFats || 0}g</p>
+            <p className="text-[10px] uppercase tracking-widest text-black/40 font-bold">Fats</p>
+            <p className="text-2xl font-black font-sans tracking-tight text-stone-900 mt-1">{dailyLog?.totalFats || 0}g</p>
           </div>
-          <p className="text-[10px] text-black/40">Target: {profile.fatsTarget}g</p>
+          <p className="text-[10px] text-black/50 font-medium">Target: <strong className="font-extrabold text-stone-700">{profile.fatsTarget}g</strong></p>
         </div>
 
         {/* Fiber */}
         <div className="bg-white p-6 rounded-[32px] border border-black/5 flex flex-col justify-between shadow-sm">
           <div>
             <Leaf className="text-emerald-500 mb-2" size={20} />
-            <p className="text-[10px] uppercase tracking-widest text-black/40">Fiber</p>
-            <p className="text-xl font-serif italic">{dailyLog?.totalFiber || 0}g</p>
+            <p className="text-[10px] uppercase tracking-widest text-black/40 font-bold">Fiber</p>
+            <p className="text-2xl font-black font-sans tracking-tight text-stone-900 mt-1">{dailyLog?.totalFiber || 0}g</p>
           </div>
-          <p className="text-[10px] text-black/40">
-            Target: {profile.fiberTarget || Math.round((profile.dailyCalorieTarget / 1000) * 14)}g
+          <p className="text-[10px] text-black/50 font-medium">
+            Target: <strong className="font-extrabold text-stone-700">{profile.fiberTarget || Math.round((profile.dailyCalorieTarget / 1000) * 14)}g</strong>
           </p>
         </div>
       </div>

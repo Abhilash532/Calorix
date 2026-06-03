@@ -7,37 +7,46 @@ import { ChefHat, Flame, Zap, Droplets, Leaf, Beef, Plus, X, Share2, User, Clock
 import { cn } from '../lib/utils';
 
 const getRelevantFoodImage = (name: string, category: string): string => {
-  const normalized = name.toLowerCase();
+  const normalized = (name || '').toLowerCase();
   
-  if (normalized.includes('paneer')) {
-    return 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=800&auto=format&fit=crop';
-  }
-  if (normalized.includes('chicken') || normalized.includes('biryani')) {
-    return 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop';
-  }
   if (normalized.includes('salad')) {
     return 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop';
   }
-  if (normalized.includes('dal') || normalized.includes('lentil') || normalized.includes('soup')) {
+  if (normalized.includes('paneer')) {
+    return 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=800&auto=format&fit=crop';
+  }
+  if (normalized.includes('tofu')) {
+    return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=800&auto=format&fit=crop';
+  }
+  if (normalized.includes('chicken') || normalized.includes('turkey') || normalized.includes('biryani') || normalized.includes('beef') || normalized.includes('poultry') || normalized.includes('meat')) {
+    return 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop';
+  }
+  if (normalized.includes('salmon') || normalized.includes('fish') || normalized.includes('tuna') || normalized.includes('shrimp') || normalized.includes('seafood') || normalized.includes('prawn')) {
+    return 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?q=80&w=800&auto=format&fit=crop';
+  }
+  if (normalized.includes('dal') || normalized.includes('lentil') || normalized.includes('soup') || normalized.includes('chickpea') || normalized.includes('moong')) {
     return 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?q=80&w=800&auto=format&fit=crop';
   }
-  if (normalized.includes('idli') || normalized.includes('dosa') || normalized.includes('samber') || normalized.includes('sambar')) {
+  if (normalized.includes('idli') || normalized.includes('dosa') || normalized.includes('samber') || normalized.includes('sambar') || normalized.includes('chilla') || normalized.includes('crepe')) {
     return 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=800&auto=format&fit=crop';
   }
-  if (normalized.includes('egg') || normalized.includes('omelette') || normalized.includes('scramble')) {
+  if (normalized.includes('egg') || normalized.includes('omelette') || normalized.includes('scramble') || normalized.includes('shakshuka')) {
     return 'https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=800&auto=format&fit=crop';
   }
-  if (normalized.includes('yogurt') || normalized.includes('smoothie')) {
+  if (normalized.includes('yogurt') || normalized.includes('smoothie') || normalized.includes('berry') || normalized.includes('chia') || normalized.includes('pudding') || normalized.includes('fruit') || normalized.includes('mango') || normalized.includes('apple') || normalized.includes('banana')) {
     return 'https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=800&auto=format&fit=crop';
   }
-  if (normalized.includes('rice') || normalized.includes('pulao')) {
+  if (normalized.includes('oat') || normalized.includes('oatmeal') || normalized.includes('porridge')) {
+    return 'https://images.unsplash.com/photo-1517881917431-13488df373ec?q=80&w=800&auto=format&fit=crop';
+  }
+  if (normalized.includes('rice') || normalized.includes('pulao') || normalized.includes('quinoa') || normalized.includes('grain')) {
     return 'https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=800&auto=format&fit=crop';
   }
-  if (normalized.includes('fish') || normalized.includes('tuna')) {
-    return 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=800&auto=format&fit=crop';
+  if (normalized.includes('stir fry') || normalized.includes('soya') || normalized.includes('sauté') || normalized.includes('spinach') || normalized.includes('cauliflower') || normalized.includes('broccoli') || normalized.includes('mushroom') || normalized.includes('beet') || normalized.includes('vegetable')) {
+    return 'https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=800&auto=format&fit=crop';
   }
-  if (normalized.includes('stir fry') || normalized.includes('soya')) {
-    return 'https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=800&auto=format&fit=crop';
+  if (normalized.includes('wrap') || normalized.includes('sandwich') || normalized.includes('taco') || normalized.includes('roll')) {
+    return 'https://images.unsplash.com/photo-1626700051175-6518c4793f4f?q=80&w=800&auto=format&fit=crop';
   }
 
   switch (category?.toLowerCase()) {
@@ -78,6 +87,9 @@ export const Recipes: React.FC<{ profile: UserProfile; user: any }> = ({ profile
     fats: 0,
     servingSize: 100,
   });
+
+  const [tempIngredient, setTempIngredient] = useState('');
+  const [tempInstruction, setTempInstruction] = useState('');
 
   useEffect(() => {
     if (!currentUser) return;
@@ -283,7 +295,7 @@ export const Recipes: React.FC<{ profile: UserProfile; user: any }> = ({ profile
             <div key={recipe.id} className="bg-white rounded-[40px] overflow-hidden shadow-sm border border-black/5 group hover:shadow-xl transition-all duration-500">
               <div className="h-48 bg-black/5 relative overflow-hidden">
                 <img 
-                  src={recipe.imageUrl || `https://picsum.photos/seed/${recipe.id}/800/600`} 
+                  src={recipe.imageUrl || getRelevantFoodImage(recipe.name, recipe.category || 'Lunch')} 
                   alt={recipe.name} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                   referrerPolicy="no-referrer" 
@@ -366,7 +378,7 @@ export const Recipes: React.FC<{ profile: UserProfile; user: any }> = ({ profile
             <div className="grid grid-cols-1 md:grid-cols-2">
               <div className="h-64 md:h-full bg-black/5">
                 <img 
-                  src={selectedRecipe.imageUrl || `https://picsum.photos/seed/${selectedRecipe.id}/800/600`} 
+                  src={selectedRecipe.imageUrl || getRelevantFoodImage(selectedRecipe.name, selectedRecipe.category || 'Lunch')} 
                   alt={selectedRecipe.name} 
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
@@ -525,6 +537,113 @@ export const Recipes: React.FC<{ profile: UserProfile; user: any }> = ({ profile
                 <div>
                   <label className="block text-[10px] uppercase tracking-tighter font-semibold text-black/50 mb-1">Fats (g)</label>
                   <input type="number" required value={newRecipe.fats} onChange={e => setNewRecipe({...newRecipe, fats: Number(e.target.value)})} className="w-full px-3 py-2 rounded-lg bg-black/5 border-none" />
+                </div>
+              </div>
+
+              {/* Dynamic Ingredients Input Section */}
+              <div>
+                <label className="block text-[11px] uppercase tracking-wider font-semibold text-black/50 mb-2">Ingredients List</label>
+                <div className="space-y-2 mb-3">
+                  {(newRecipe.ingredients || []).map((ing, k) => (
+                    <div key={k} className="flex items-center justify-between bg-black/5 px-4 py-2 rounded-xl text-sm gap-2">
+                      <span>{ing}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewRecipe(p => ({
+                            ...p,
+                            ingredients: (p.ingredients || []).filter((_, i) => i !== k)
+                          }));
+                        }}
+                        className="text-black/40 hover:text-red-500 transition-colors"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                  {(newRecipe.ingredients || []).length === 0 && (
+                    <p className="text-xs text-black/30 italic">No ingredients added yet. Enter down below.</p>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={tempIngredient}
+                    onChange={e => setTempIngredient(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (tempIngredient.trim()) {
+                          setNewRecipe(p => ({ ...p, ingredients: [...(p.ingredients || []), tempIngredient.trim()] }));
+                          setTempIngredient('');
+                        }
+                      }
+                    }}
+                    placeholder="Add ingredient e.g. 100g Fresh Paneer..."
+                    className="flex-1 px-4 py-3 rounded-xl bg-black/5 border-none focus:ring-2 focus:ring-black/10 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (tempIngredient.trim()) {
+                        setNewRecipe(p => ({ ...p, ingredients: [...(p.ingredients || []), tempIngredient.trim()] }));
+                        setTempIngredient('');
+                      }
+                    }}
+                    className="px-4 bg-black text-white rounded-xl text-xs font-bold hover:bg-black/90"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              {/* Dynamic Instructions Input Section */}
+              <div>
+                <label className="block text-[11px] uppercase tracking-wider font-semibold text-black/50 mb-2">Instructions Steps</label>
+                <div className="space-y-2 mb-3">
+                  {(newRecipe.instructions || []).map((step, k) => (
+                    <div key={k} className="flex items-start justify-between bg-black/5 px-4 py-2 rounded-xl text-sm gap-2">
+                      <span className="flex gap-2">
+                        <strong className="text-black/40">{k + 1}.</strong>
+                        <span>{step}</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewRecipe(p => ({
+                            ...p,
+                            instructions: (p.instructions || []).filter((_, i) => i !== k)
+                          }));
+                        }}
+                        className="text-black/40 hover:text-red-500 transition-colors shrink-0"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                  {(newRecipe.instructions || []).length === 0 && (
+                    <p className="text-xs text-black/30 italic">No instruction steps added yet. Enter down below.</p>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <textarea
+                    value={tempInstruction}
+                    onChange={e => setTempInstruction(e.target.value)}
+                    placeholder="Add step description e.g. Heat honey and almond milk in a pot..."
+                    className="flex-1 px-4 py-3 rounded-xl bg-black/5 border-none focus:ring-2 focus:ring-black/10 text-sm h-16 resize-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (tempInstruction.trim()) {
+                        setNewRecipe(p => ({ ...p, instructions: [...(p.instructions || []), tempInstruction.trim()] }));
+                        setTempInstruction('');
+                      }
+                    }}
+                    className="px-4 bg-black text-white rounded-xl text-xs font-bold hover:bg-black/90 self-end h-11"
+                  >
+                    Add Step
+                  </button>
                 </div>
               </div>
 
