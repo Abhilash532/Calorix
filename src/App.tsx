@@ -40,13 +40,35 @@ export default function App() {
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) {
-        const docRef = doc(db, 'users', u.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setProfile(docSnap.data() as UserProfile);
+        try {
+          const docRef = doc(db, 'users', u.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setProfile(docSnap.data() as UserProfile);
+          }
+        } catch (e) {
+          console.error('Error fetching user profile:', e);
         }
       } else {
-        setProfile(null);
+        const demoProfile = localStorage.getItem('calorix_profile_demo');
+        if (demoProfile) {
+          try {
+            const parsed = JSON.parse(demoProfile);
+            setUser({
+              uid: parsed.uid || 'demo_user',
+              email: parsed.email || 'demo@calorix.com',
+              displayName: parsed.displayName || 'Demo Hero',
+              isDemo: true,
+            });
+            setProfile(parsed);
+          } catch (e) {
+            console.error('Error restoring demo profile:', e);
+            localStorage.removeItem('calorix_profile_demo');
+            setProfile(null);
+          }
+        } else {
+          setProfile(null);
+        }
       }
       setLoading(false);
     });
@@ -61,7 +83,16 @@ export default function App() {
       isDemo: true,
     };
     setUser(mockUser);
-    setProfile(null);
+    const savedDemo = localStorage.getItem('calorix_profile_demo');
+    if (savedDemo) {
+      try {
+        setProfile(JSON.parse(savedDemo));
+      } catch {
+        setProfile(null);
+      }
+    } else {
+      setProfile(null);
+    }
   };
 
   const handleSignOut = async () => {
@@ -119,7 +150,15 @@ export default function App() {
       <div className="relative min-h-screen bg-[#F5F5F0] overflow-hidden">
         <FloatingHealthAmbient />
         <div className="relative z-10 w-full animate-fade-in">
-          <ProfileSetup user={user} initialProfile={profile} onComplete={(newProfile) => { setProfile(newProfile); setIsEditingProfile(false); }} />
+          <ProfileSetup
+            user={user}
+            initialProfile={profile}
+            onComplete={(newProfile) => {
+              setProfile(newProfile);
+              setIsEditingProfile(false);
+            }}
+            onCancel={() => setIsEditingProfile(false)}
+          />
         </div>
       </div>
     );
