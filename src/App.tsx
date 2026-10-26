@@ -9,13 +9,15 @@ import { Dashboard } from './components/Dashboard';
 import { Recipes } from './components/Recipes';
 import { Community } from './components/Community';
 import { Admin } from './components/Admin';
-import { LogOut, ChefHat, LayoutDashboard, Users, ShieldCheck } from 'lucide-react';
+import { BioLab } from './components/BioLab';
+import { LogOut, ChefHat, LayoutDashboard, Users, ShieldCheck, FlaskConical } from 'lucide-react';
+import { FloatingHealthAmbient } from './components/FloatingHealthAmbient';
 
 export default function App() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'recipes' | 'community' | 'admin'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'recipes' | 'community' | 'admin' | 'biolab'>('dashboard');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   const CREATOR_EMAIL = 'aabhi20604@gmail.com';
@@ -102,15 +104,31 @@ export default function App() {
   }
 
   if (!user) {
-    return <Auth onSkipLogin={handleSkipLogin} />;
+    return (
+      <div className="relative min-h-screen bg-[#F5F5F0] overflow-hidden">
+        <FloatingHealthAmbient />
+        <div className="relative z-10">
+          <Auth onSkipLogin={handleSkipLogin} />
+        </div>
+      </div>
+    );
   }
 
   if (!profile || isEditingProfile) {
-    return <ProfileSetup user={user} initialProfile={profile} onComplete={(newProfile) => { setProfile(newProfile); setIsEditingProfile(false); }} />;
+    return (
+      <div className="relative min-h-screen bg-[#F5F5F0] overflow-hidden">
+        <FloatingHealthAmbient />
+        <div className="relative z-10 w-full animate-fade-in">
+          <ProfileSetup user={user} initialProfile={profile} onComplete={(newProfile) => { setProfile(newProfile); setIsEditingProfile(false); }} />
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F0] pt-16 md:pt-20 pb-24 md:pb-6">
+    <div className="relative min-h-screen bg-[#F5F5F0] pt-16 md:pt-20 pb-24 md:pb-6 overflow-x-hidden">
+      <FloatingHealthAmbient />
+      <div className="relative z-10 w-full">
       {/* Responsive Header */}
       <header className="flex fixed top-0 left-0 right-0 h-16 md:h-20 bg-white/80 backdrop-blur-md border-b border-black/5 z-40 items-center justify-between px-4 md:px-8">
         <div className="flex items-center gap-8">
@@ -129,6 +147,13 @@ export default function App() {
               className={`text-sm font-medium transition-all ${activeTab === 'recipes' ? 'text-black' : 'text-black/40 hover:text-black'}`}
             >
               Recipes
+            </button>
+            <button
+              onClick={() => setActiveTab('biolab')}
+              className={`text-xs uppercase tracking-widest font-extrabold flex items-center gap-1.5 transition-all ${activeTab === 'biolab' ? 'bg-orange-500 text-white px-3 py-1.5 rounded-full shadow-sm' : 'text-orange-500 hover:text-orange-600 bg-orange-50 px-3 py-1.5 rounded-full'}`}
+            >
+              <FlaskConical size={13} className="fill-current/10" />
+              Bio-Lab
             </button>
             <button
               onClick={() => setActiveTab('community')}
@@ -175,40 +200,48 @@ export default function App() {
       <main className="pt-2 md:pt-4">
         {activeTab === 'dashboard' && <Dashboard profile={profile} user={user} onProfileUpdate={setProfile} />}
         {activeTab === 'recipes' && <Recipes profile={profile} user={user} />}
+        {activeTab === 'biolab' && <BioLab profile={profile} />}
         {activeTab === 'community' && <Community user={user} />}
         {activeTab === 'admin' && isCreator && <Admin />}
       </main>
 
       {/* Mobile Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-black/5 z-40 flex items-center justify-around px-4">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-black/5 z-40 flex items-center justify-around px-2">
         <button
           onClick={() => setActiveTab('dashboard')}
           className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'dashboard' ? 'text-black' : 'text-black/30'}`}
         >
-          <LayoutDashboard size={24} />
-          <span className="text-[10px] font-bold uppercase tracking-widest">Track</span>
+          <LayoutDashboard size={20} />
+          <span className="text-[9px] font-bold uppercase tracking-widest">Track</span>
         </button>
         <button
           onClick={() => setActiveTab('recipes')}
           className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'recipes' ? 'text-black' : 'text-black/30'}`}
         >
-          <ChefHat size={24} />
-          <span className="text-[10px] font-bold uppercase tracking-widest">Eat</span>
+          <ChefHat size={20} />
+          <span className="text-[9px] font-bold uppercase tracking-widest">Eat</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('biolab')}
+          className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'biolab' ? 'text-orange-500' : 'text-black/30'}`}
+        >
+          <FlaskConical size={20} />
+          <span className="text-[9px] font-bold uppercase tracking-widest">BioLab</span>
         </button>
         <button
           onClick={() => setActiveTab('community')}
           className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'community' ? 'text-black' : 'text-black/30'}`}
         >
-          <Users size={24} />
-          <span className="text-[10px] font-bold uppercase tracking-widest">Social</span>
+          <Users size={20} />
+          <span className="text-[9px] font-bold uppercase tracking-widest">Social</span>
         </button>
         {isCreator && (
           <button
             onClick={() => setActiveTab('admin')}
             className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'admin' ? 'text-orange-500' : 'text-black/30'}`}
           >
-            <ShieldCheck size={24} />
-            <span className="text-[10px] font-bold uppercase tracking-widest">Admin</span>
+            <ShieldCheck size={20} />
+            <span className="text-[9px] font-bold uppercase tracking-widest">Admin</span>
           </button>
         )}
         <button
@@ -219,6 +252,7 @@ export default function App() {
           <span className="text-[10px] font-bold uppercase tracking-widest">Exit</span>
         </button>
       </nav>
+      </div>
     </div>
   );
 }
